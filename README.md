@@ -1,31 +1,21 @@
-# Automated File Update and Monitoring System
 
-## Project Overview
-
-This project is designed to automatically monitor changes in files within specified folders and, when certain conditions are met, trigger a Python script (`updating.py`) to perform file update operations. The system incorporates a dual-layer error notification mechanism to ensure timely alerts in case of any anomalies.
-
-### Project Files
-
-* **`monitoring_folder_and_trigger_action.py`**:
-    The main monitoring script responsible for listening to file changes in folders, determining if trigger conditions are met, and executing `updating.py`.
-* **`updating.py`**:
-    The script that executes the actual file update logic, including Excel file processing, macro execution, and email notifications.
-* **`send_outlook_email.py`**:
-    A general utility script used for sending Outlook emails.
-* **`config.yaml`**:
-    The externalized configuration file containing all configurable paths, file rules, email lists, etc.
-
-## Configuration
-
-All project-related settings are centralized in the `config.yaml` file. It is crucial to review and modify this file to match your environment before starting the project.
-
-### `config.yaml` Example and Explanation
 
 # 檔案自動更新與監控系統
 
 ## 專案概覽
 
 本專案旨在自動監控指定資料夾中的檔案變動，並在符合特定條件時觸發一個 Python 腳本（`updating.py`）來執行檔案更新操作。系統設計了雙重錯誤通知機制，以確保在任何情況下都能及時收到異常警報。
+
+### 前提條件
+
+1.  **Python 環境**: 確保您的系統安裝了 Python 3.x。
+2.  **依賴庫**:
+    * **推薦安裝方式**: 在專案根目錄下運行 `pip install -r requirements.txt`。
+    * 手動安裝（如果沒有 `requirements.txt`）:
+        * `pywin32` (`pip install pywin32`)：用於與 Outlook 應用程式互動。
+        * `openpyxl` (`pip install openpyxl`)：用於處理 Excel XLSX/XLSM 檔案。
+        * `PyYAML` (`pip install PyYAML`)：用於讀取 `config.yaml` 檔案。
+3.  **Outlook 應用程式**: `send_outlook_email.py` 腳本依賴於 Outlook 應用程式的運行。
 
 ### 專案文件
 
