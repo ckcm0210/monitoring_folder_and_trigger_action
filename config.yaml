@@ -1,0 +1,38 @@
+# This section defines the folders to be monitored.
+# Each folder has a path and an associated updating script.
+folders:
+  - folder_path: "K:\\Chain\\2024Q4\\Preliminary\\Test2 - new"
+    updating_script: "V:\\新增資料夾\\updating.py"
+  - folder_path: "K:\\Chain\\2024Q4\\Preliminary\\Test2 - interim"
+    updating_script: "V:\\新增資料夾\\updating.py"
+
+# These are regex patterns for files in Group A.
+file_group_a:
+  - "Data - Section"
+  - "Data - Taxes"
+  - "Data - Ownership"
+  - "Related"
+
+# These are regex patterns for files in Group B.
+file_group_b:
+  - "Data - All"
+  - "Chain Summary"
+  - "BM Compare"
+
+# How often to check for file changes (in seconds).
+check_interval: 2
+
+# Cooldown period after files are detected as stable (in seconds).
+cooldown_period: 2
+
+# Email recipient settings for notifications.
+email_recipients:
+  to: ["your_email@example.com"]
+  cc: []
+  bcc: []
+
+# Prefix for email subjects.
+email_subject_prefix: "K Chain File Refresh Completion Notification"
+
+# Directory where log files will be stored.
+log_directory: "D:\\Pzone\\log"
