@@ -17,14 +17,14 @@
 
 為了確保程式能正確地找到並導入所有模組和配置檔案，建議您的專案目錄結構如下：
 
-your_project_root/
-├── main_workflow.py
-├── monitoring.py
-├── monitoring_config.yaml
-├── updating.py
-├── updating_config.yaml
-└── utility/
-     └── send_outlook_email.py
+*your_project_root/
+*├── main_workflow.py
+*├── monitoring.py
+*├── monitoring_config.yaml
+*├── updating.py
+*├── updating_config.yaml
+*└── utility/
+*     └── send_outlook_email.py
 
 * `your_project_root/`: 這是您的專案主目錄。
 * `main_workflow.py`、`monitoring.py`、`updating.py`：這些是主要的 Python 腳本，直接位於專案根目錄下。
