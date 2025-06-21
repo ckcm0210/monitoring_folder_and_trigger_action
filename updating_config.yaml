@@ -1,34 +1,33 @@
-# Email recipient settings for notifications.
+# Email recipient settings for sending notifications.
 email_recipients:
-  to: ["your_email@example.com"]
-  cc: []
-  bcc: []
+  to: ["your_email@example.com"]      # 主收件人列表 ["your_email@example.com"] 或 ["your_email@example.com", ["colleague@example.com"] ] 
+  cc: []                             # 副本收件人列表（可選）
+  bcc: []                            # 密件副本收件人列表（可選）
 
 # Prefix for email subjects.
-email_subject_prefix: "K Chain File Refresh Completion Notification"
+email_subject_prefix: "K Chain File Refresh Completion Notification" # 電郵主旨前綴
 
 # Directory where log files will be stored.
-log_directory: "D:\\Pzone\\log"
+log_directory: "D:\\Pzone\\log"        # 日誌存放資料夾路徑
 
-# File specific configurations including macros and passwords.
+# File-specific configurations for Excel files, including macro names and密碼
 file_configs:
   Data - All:
-    macro: null
-    open_password: null
-    write_password: "2011chainref"
+    macro: null                       # 執行 macro 名稱，若無需 macro 用 null
+    open_password: null               # 開啟密碼，建議用環境變數（見下方說明）
+    write_password: "abc"             # 儲存密碼，建議用環境變數
   Chain Summary:
     macro: null
     open_password: null
-    write_password: "2011chainref"
+    write_password: "abc"
   BM Compare:
-    macro: "Main"
+    macro: "Main"                     # 需要執行 macro「Main」
     open_password: null
     write_password: null
 
+# 進階設定
 advanced_settings:
-  max_retries: 3
-  retry_delay_base: 2
-  excel_visible: True
-  force_calculation: True
-
-  
+  max_retries: 3                      # 操作失敗時最多重試次數
+  retry_delay_base: 2                 # 重試延遲基數（秒），指數型增加
+  excel_visible: True                 # Excel 是否顯示（True=顯示，False=背景運行）
+  force_calculation: True             # 是否強制重新計算所有公式
