@@ -1,188 +1,195 @@
-# 文件監控與自動化更新系統
+# 文件監控與自動自動化更新系統  
+[English version available → README_en.md](README_en.md)
 
-這是一個自動化的 Python 解決方案，旨在監控特定資料夾中的文件變更。當檢測到預設文件組（Group A）比另一組文件（Group B）更新時，它將自動觸發一個更新腳本，並在更新完成後發送電子郵件通知。
+本專案是一個針對 Windows/Excel 報表流程設計的自動化解決方案。能自動監控指定資料夾，根據文件變動智能觸發更新腳本，並於流程完成後自動發送郵件通知，適合辦公室自動報表、跨部門文件同步等自動化需求。
 
-## 專案概述
+---
 
-本專案主要由以下幾個模組組成：
+## 目錄
+- [專案簡介](#專案簡介)
+- [特色功能](#特色功能)
+- [檔案結構說明](#檔案結構說明)
+- [快速開始](#快速開始)
+- [環境與安裝](#環境與安裝)
+- [設定說明](#設定說明)
+- [使用方式](#使用方式)
+- [常見問題 FAQ](#常見問題-faq)
+- [貢獻方式](#貢獻方式)
+- [授權條款](#授權條款)
 
-* **`main_workflow.py`**: 整個自動化流程的入口點。它負責初始化文件監控系統，並在監控過程中協調各個模組的執行。
-* **`monitoring.py`**: 核心文件監控模組。它會定期檢查配置中定義的資料夾，比較 Group A 和 Group B 文件組的最新修改時間，以判斷是否需要觸發更新。
-* **`updating.py`**: 當 `monitoring.py` 檢測到文件變更並滿足觸發條件時，會調用此腳本執行實際的更新操作。此腳本支援對 Excel 檔案進行操作（如執行宏、處理密碼），並會生成操作日誌。
-* **`send_outlook_email.py`**: 一個實用工具模組，用於透過 Outlook 發送電子郵件通知。它被 `updating.py` 用於在更新完成後發送帶有日誌內容的通知郵件。
-* **`monitoring_config.yaml`**: 監控模組的配置檔案，定義了要監控的資料夾、文件組的正則表達式模式、檢查間隔和冷卻時間等。
-* **`updating_config.yaml`**: 更新模組的配置檔案，定義了日誌目錄、Excel 檔案的宏和密碼設定、郵件接收者和主旨前綴等。
+---
 
-## 檔案結構
+## 專案簡介
 
-為了確保程式能正確地找到並導入所有模組和配置檔案，建議您的專案目錄結構如下：
+此專案能夠：
+- 持續監控多個資料夾內的文件，根據自訂規則（Group A/Group B）判斷是否需要自動觸發更新。
+- 當檢測到 Group A 文件比 Group B 新，且通過冷卻期，會自動執行更新腳本（如自動刷新 Excel、執行巨集、重新整理連結）。
+- 程序完成後，自動寄發詳細日誌郵件（經由 Outlook）給指定收件人。
+- 所有關鍵參數皆可於 YAML 設定檔彈性調整。
 
-your_project_root/<br/>
-├── main_workflow.py<br/>
-├── monitoring.py<br/>
-├── monitoring_config.yaml<br/>
-├── updating.py<br/>
-├── updating_config.yaml<br/>
-└── utility/<br/>
-     └── send_outlook_email.py<br/>
+---
 
-* `your_project_root/`: 這是您的專案主目錄。
-* `main_workflow.py`、`monitoring.py`、`updating.py`：這些是主要的 Python 腳本，直接位於專案根目錄下。
-* `monitoring_config.yaml`、`updating_config.yaml`：這些是配置檔案，也直接位於專案根目錄下。
-* `utility/`：這是一個子目錄，用於存放輔助性質的 Python 模組。
-* `send_outlook_email.py`：這個模組位於 `utility/` 子目錄中，被其他主腳本導入使用。
+## 特色功能
 
-這種結構符合 Python 的模組化最佳實踐，並便於管理。
+- **多資料夾監控**：可同時監控多個指定目錄。
+- **智能觸發條件**：Group A/B 文件規則可用關鍵字或正則表達式自訂。
+- **自動冷卻期**：避免檔案尚未穩定即觸發後續處理。
+- **Excel 自動化**：支援密碼保護、巨集執行、連結/連線刷新。
+- **詳細日誌與自動郵件**：流程完成自動寄送日誌至指定信箱。
+- **高度可設定**：所有規則、路徑、郵件、密碼、進階行為皆可於 YAML 配置。
+- **錯誤處理與通知**：多層次例外處理，失敗時自動郵件通知。
 
-## 系統功能
+---
 
-* **持續文件監控**: 定期掃描預設資料夾。
-* **智能變更檢測**: 根據 Group A 和 Group B 文件的修改時間判斷是否觸發更新。
-* **穩定性冷卻期**: 在文件變動後，等待一段冷卻時間，確保文件穩定後才執行更新，避免在文件仍在寫入時觸發。
-* **自動化更新觸發**: 滿足條件時自動執行預設的更新腳本。
-* **Excel 自動化**: `updating.py` 能夠處理 Excel 檔案，包括開啟受密碼保護的檔案、執行 VBA 宏、保存並關閉檔案。
-* **詳細日誌記錄**: 記錄所有重要的操作和潛在問題。
-* **郵件通知**: 在更新流程完成後，透過 Outlook 發送詳細的操作日誌作為郵件內容。
-* **可配置性**: 大部分關鍵設定都儲存在 `.yaml` 配置文件中，方便用戶根據需求修改。
+## 檔案結構說明
 
-## 環境要求
+```
+your_project_root/
+├── main_workflow.py               # 主流程入口
+├── monitoring.py                  # 檔案監控邏輯
+├── monitoring_config.yaml         # 監控參數設定
+├── updating.py                    # Excel 自動化更新腳本
+├── updating_config.yaml           # 更新腳本參數設定
+├── utility/
+│   └── send_outlook_email.py      # Outlook 郵件寄送工具
+├── !_run_me_to_start_monitoring.ipynb # Jupyter 啟動範例
+├── LICENSE                        # 授權條款 (MIT)
+├── README.md                      # 本說明文件
+└── README_en.md                   # 英文說明文件
+```
 
-1.  **Python 環境**: 確保您的系統安裝了 Python 3.x。
-2.  **依賴庫**:
-    * **推薦安裝方式**: 在專案根目錄下運行 `pip install -r requirements.txt`。
-    * 手動安裝（如果沒有 `requirements.txt`）:
-        * `pywin32` (`pip install pywin32`)：用於與 Outlook 應用程式互動。
-        * `openpyxl` (`pip install openpyxl`)：用於處理 Excel XLSX/XLSM 檔案。
-        * `PyYAML` (`pip install PyYAML`)：用於讀取 `config.yaml` 檔案。
-3.  **Outlook 應用程式**: `send_outlook_email.py` 腳本依賴於 Outlook 應用程式的運行。
+---
 
-## 安裝
+## 快速開始
 
-1.  **克隆倉庫**:
+1. **Clone 專案**
     ```bash
-    git clone <您的_GitHub_倉庫地址>
-    cd <您的_專案資料夾名稱>
+    git clone https://github.com/ckcm0210/monitoring_folder_and_trigger_action.git
+    cd monitoring_folder_and_trigger_action
     ```
 
-2.  **安裝依賴**:
-    推薦使用 `pip` 安裝所有必要的 Python 庫。
+2. **安裝必要套件**
+    若有 requirements.txt：
+    ```bash
+    pip install -r requirements.txt
+    ```
+    若無，請手動安裝：
     ```bash
     pip install pywin32 pyyaml openpyxl
     ```
-    * `pywin32`: 提供了 `win32com.client`，用於與 Windows 應用程式（如 Outlook 和 Excel）交互。
-    * `pyyaml`: 用於讀取和解析 `.yaml` 配置文件。
-    * `openpyxl`: 用於處理 `.xlsx` 格式的 Excel 檔案（`updating.py` 中可能用到，儘管主要依賴 `win32com`）。
 
-## 配置
+3. **編輯設定檔**  
+    - 複製並修改 `monitoring_config.yaml` 及 `updating_config.yaml`，填入你的路徑、檔名規則、信箱等資訊。
+    - 建議可保留 example 配置檔以利日後參考。
 
-在運行程式之前，您需要配置以下兩個 `.yaml` 檔案以符合您的環境和需求：
+4. **確認環境**
+    - 僅支援 Windows（因需自動化 Excel/Outlook）。
+    - 請確認 Outlook 與 Excel 已安裝並可正常啟動。
 
-1.  **`monitoring_config.yaml`**:
-    * `folders`: 定義要監控的資料夾路徑及其對應的更新腳本路徑。
-    * `file_group_a`: 一組正則表達式模式，用於匹配需要監控的文件（通常是數據輸入或更新文件）。
-    * `file_group_b`: 另一組正則表達式模式，用於匹配作為比較基準的文件（通常是輸出或彙總文件）。
-    * `check_interval`: 每次檢查文件變更之間的等待時間（秒）。
-    * `cooldown_period`: 在文件穩定後，執行更新腳本前的冷卻時間（秒）。
+---
 
-    範例：
-    ```yaml
-    folders:
-      - folder_path: "K:\\Chain\\2024Q4\\Preliminary\\Test2 - new"
-        updating_script: "V:\\新增資料夾\\updating.py" # 注意：這裡的 updating_script 路徑仍指向實際的 updating.py 檔案
-      - folder_path: "K:\\Chain\\2024Q4\\Preliminary\\Test2 - interim"
-        updating_script: "V:\\新增資料夾\\updating.py" # 同上
-    file_group_a:
-      - "Data - Section"
-      - "Data - Taxes"
-      - "Data - Ownership"
-      - "Related"
-    # ... 其他配置
-    ```
+## 環境與安裝
 
-2.  **`updating_config.yaml`**:
-    * `email_recipients`: 配置郵件的 `to`、`cc` 和 `bcc` 收件人列表。
-    * `email_subject_prefix`: 郵件主旨的前綴。
-    * `log_directory`: 程式運行日誌文件的儲存目錄。
-    * `file_configs`: 針對特定 Excel 檔案的配置，例如宏名稱、開啟密碼和寫入密碼。
-    * `advanced_settings`: 高級設定，例如 Excel 應用程式是否可見、重試次數等。
+- **作業系統**：僅支援 Windows
+- **Python 版本**：3.7+
+- **必要套件**：
+    - pywin32（與 Outlook/Excel 溝通）
+    - openpyxl（Excel 檔案處理）
+    - PyYAML（讀取 YAML 設定）
+- **需安裝 Microsoft Outlook & Excel**
 
-    範例：
-    ```yaml
-    email_recipients:
-      to: ["your_email@example.com"]
-      cc: []
-      bcc: []
-    file_configs:
-      Data - All:
-        macro: null
-        open_password: null
-        write_password: "2011chainref"
-      Chain Summary:
-        macro: null
-        open_password: null
-        write_password: "2011chainref"
-      BM Compare:
-        macro: "Main"
-        open_password: null
-        write_password: null
-    # ... 其他配置
-    ```
-    **注意**: `updating_script` 在 `monitoring_config.yaml` 中指定的路徑，應指向實際的 `updating.py` 檔案。
+---
 
-## 如何運行
+## 設定說明
 
-確保您已經完成了上述的安裝和配置步驟。
+### 1. `monitoring_config.yaml`
+- 設定監控哪些資料夾、匹配哪些檔案、觸發哪些更新腳本。
+- Group A/Group B 支援正則或關鍵字，冷卻期可調整。
 
-1.  **確保 Outlook 運行中**: 由於郵件功能依賴於 Outlook，請確保您的 Outlook 應用程式正在運行。
-2.  **運行主工作流程**:
-    打開您的命令提示符或終端機，導航到專案的根目錄，然後運行 `main_workflow.py`：
+#### 範例片段
+```yaml
+folders:
+  - folder_path: "K:\\Chain\\2024Q4\\Preliminary\\Test2 - new"
+    updating_script: "V:\\新增資料夾\\updating.py"
+file_group_a:
+  - "Data - Section"
+  - "Data - Taxes"
+file_group_b:
+  - "Data - All"
+  - "Chain Summary"
+check_interval: 2
+cooldown_period: 2
+```
+
+### 2. `updating_config.yaml`
+- 設定郵件收件人、Excel 密碼/巨集、日誌目錄、進階自動化細節。
+
+#### 範例片段
+```yaml
+email_recipients:
+  to: ["your_email@example.com"]
+  cc: []
+  bcc: []
+file_configs:
+  Data - All:
+    macro: null
+    open_password: null
+    write_password: "abc123"
+advanced_settings:
+  max_retries: 3
+  retry_delay_base: 2
+  excel_visible: False
+  force_calculation: True
+```
+
+---
+
+## 使用方式
+
+1. **啟動監控主程式：**
     ```bash
     python main_workflow.py
     ```
 
-    或者，如果您是在 Jupyter Notebook 環境中，可以直接運行 `main_workflow_entry()` 函數：
-    ```python
-    # 在 Jupyter Notebook 中
-    import sys
-    import os
+2. **Jupyter Notebook 啟動（可選）：**
+    直接開啟`!_run_me_to_start_monitoring.ipynb`並執行即可。
 
-    current_dir = os.path.dirname(os.path.abspath(__file__))
-    # 將專案根目錄加入 sys.path，確保可以找到 utility 模組
-    project_root = os.path.abspath(os.path.join(current_dir)) # 確保 project_root 是當前檔案所在的目錄
-    if project_root not in sys.path:
-        sys.path.append(project_root)
+3. **停止監控：**
+    - 於命令列視窗按 `Ctrl+C`。
 
-    import main_workflow
-    main_workflow.main_workflow_entry()
-    ```
+---
 
-程式將會開始監控文件。您可以隨時按下 `Ctrl+C` 來手動停止監控流程。
+## 常見問題 FAQ
 
-## 注意事項
+### 1. 為什麼郵件無法自動寄出？
+- 請確認 Outlook 已安裝並啟動，且帳號已登入。
+- 檢查 Python 是否有權限操作 Outlook。
 
-* **檔案路徑**: 請確保所有配置中的檔案和資料夾路徑都是正確且可訪問的。
-* **Outlook 和 Excel 權限**: 確保運行腳本的用戶帳戶有足夠的權限來控制 Outlook 和 Excel 應用程式。
-* **日誌目錄**: 確保 `updating_config.yaml` 中配置的 `log_directory` 存在且可寫。
-* **Excel 密碼**: 如果 Excel 檔案有密碼保護，請在 `updating_config.yaml` 中正確配置 `open_password` 或 `write_password`。
-* **宏安全性**: 如果您的 Excel 檔案包含宏，請確保 Excel 的宏安全設定允許執行宏，或者將您的專案資料夾添加到信任位置。
-* **文件名空格**: 請確保所有導入的 Python 檔案名不包含空格，例如 `send_outlook_email.py` 而不是 `send_outlook_email .py`。
+### 2. 執行時出現 ImportError？
+- 檢查路徑與檔名（不得有多餘空白）。
+- 確認所有必要 Python 套件已安裝。
 
-## 故障排除
+### 3. 監控流程未自動觸發？
+- 檢查 Group A/B 規則是否正確匹配檔案。
+- 冷卻期設太短可能導致檔案未寫完即被處理。
 
-* **`ImportError`**: 如果運行時遇到 `ImportError`，請檢查檔案名稱是否正確，並確保所有必要的模組都已安裝。特別是檢查 `send_outlook_email.py` 的檔案名稱是否已修正（已從 `send_outlook_email .py` 修改為 `send_outlook_email.py`），且其路徑符合 `utility/send_outlook_email.py`。
-* **Outlook/Excel 自動化問題**:
-    * 確保 Outlook 和 Excel 已安裝並正常運行。
-    * 檢查是否有任何安全彈出窗口阻止了程式的交互。
-    * 檢查 `pywin32` 是否正確安裝。
-* **文件未觸發更新**:
-    * 檢查 `monitoring_config.yaml` 中的 `file_group_a` 和 `file_group_b` 正則表達式是否正確匹配您的文件。
-    * 檢查文件的修改時間是否符合預期，即 Group A 確實比 Group B 新。
-    * 調整 `check_interval` 和 `cooldown_period` 以適應您的需求。
+### 4. Excel 檔案有密碼或巨集問題？
+- 請於設定檔內正確填寫密碼/巨集名稱，必要時調整信任位置與巨集安全性。
 
-## 貢獻
+更多問題歡迎開 issue 提問！
 
-如果您有任何建議或發現錯誤，歡迎提出 issue 或 pull request。
+---
 
-## 許可證
+## 貢獻方式
 
-[在此處放置您的許可證信息，例如 MIT 許可證]
+- 歡迎 issue、pull request 修正錯誤或建議新功能。
+- 建議勿將含敏感資訊（如帳號密碼）直接 commit 至公開 repository。
+- 貢獻前請詳閱程式註解與說明文件。
+
+---
+
+## 授權條款
+
+本專案採用 [MIT License](LICENSE) 授權，歡迎自由使用、修改與散布。
+
+---
