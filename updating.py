@@ -749,7 +749,7 @@ def validate_configuration():
         errors.append(f"Base directory does not exist: {USER_CONFIG['base_directory']}")
     
     # Check file configurations
-    if not USER_CONFIG["FILE_CONFIGS"]:
+    if not USER_CONFIG["file_configs"]:
         errors.append("No file configurations specified")
     
     # Check advanced settings
@@ -778,7 +778,7 @@ def main():
 
         process_excel_files_in_directory(
             USER_CONFIG["base_directory"],
-            USER_CONFIG["FILE_CONFIGS"]
+            USER_CONFIG["file_configs"]
         )
 
         console_print("")
