@@ -69,7 +69,7 @@ def setup_logging():
     logger.info(f"📁 Log directory created/confirmed: {log_dir}")  # This will now have proper formatting
     logger.info(f"📄 Log file: {log_filename}")
     logger.info(f"📁 Configured base directory: {USER_CONFIG['base_directory']}")
-    logger.info(f"🏷️ Configured file prefixes: {list(USER_CONFIG['FILE_CONFIGS'].keys())}")
+    logger.info(f"🏷️ Configured file prefixes: {list(USER_CONFIG['file_configs'].keys())}")
     logger.info("="*80)
     
     return logger
