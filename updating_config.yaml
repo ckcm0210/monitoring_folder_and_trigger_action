@@ -1,0 +1,34 @@
+# Email recipient settings for notifications.
+email_recipients:
+  to: ["your_email@example.com"]
+  cc: []
+  bcc: []
+
+# Prefix for email subjects.
+email_subject_prefix: "K Chain File Refresh Completion Notification"
+
+# Directory where log files will be stored.
+log_directory: "D:\\Pzone\\log"
+
+# File specific configurations including macros and passwords.
+file_configs:
+  Data - All:
+    macro: null
+    open_password: null
+    write_password: "2011chainref"
+  Chain Summary:
+    macro: null
+    open_password: null
+    write_password: "2011chainref"
+  BM Compare:
+    macro: "Main"
+    open_password: null
+    write_password: null
+
+advanced_settings:
+  max_retries: 3
+  retry_delay_base: 2
+  excel_visible: True
+  force_calculation: True
+
+  
