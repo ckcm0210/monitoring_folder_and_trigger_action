@@ -777,7 +777,7 @@ def main():
         log_filepath = os.environ.get("log_filepath")
 
         process_excel_files_in_directory(
-            USER_CONFIG["BASE_DIRECTORY"],
+            USER_CONFIG["base_directory"],
             USER_CONFIG["FILE_CONFIGS"]
         )
 
