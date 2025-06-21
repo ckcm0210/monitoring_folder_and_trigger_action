@@ -26,7 +26,13 @@ def expand_path(path):
 
 # --- 工具函式 ---
 def print_message(message, message_type="INFO"):
-    symbol = {"INFO": "ℹ", "ACTION": "➤", "WARNING": "⚠", "ERROR": "❌"}
+    symbol = {
+        "INFO": "ℹ",
+        "ACTION": "➤",
+        "WARNING": "⚠️",
+        "ERROR": "❌",
+        "SUCCESS": "🎉"
+    }
     current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     print(f"{symbol.get(message_type, 'ℹ')} [{message_type}] {current_time}: {message}")
 
@@ -51,13 +57,13 @@ def run_updating_script(updating_script_path, monitored_folder_path):
 
         os.environ["BASE_DIRECTORY_FROM_MONITOR"] = monitored_folder_path
         sys.argv = [updating_script_path, monitored_folder_path]
-        print_message(f"Attempting to run script {updating_script_path} with BASE_DIRECTORY: {monitored_folder_path}", "ACTION")
+        print_message(f"➤ Running update script: {updating_script_path}", "ACTION")
         spec.loader.exec_module(module)
         exit_code = module.main()
         sys.argv = original_argv
         return exit_code == 0
     except Exception as e:
-        print_message(f"Error executing script {updating_script_path}: {str(e)}", "ERROR")
+        print_message(f"❌ Error executing script {updating_script_path}: {str(e)}", "ERROR")
         # Optional: email notification if config 裡有 email_recipients
         if "email_recipients" in monitoring_config:
             try:
@@ -77,11 +83,9 @@ def run_updating_script(updating_script_path, monitored_folder_path):
             del sys.modules[script_name]
         sys.argv = original_argv
 
-def monitor_folder(monitored_folder_path):
+def monitor_folder(monitored_folder_path, file_group_a, file_group_b):
     group_a_last_times = {}
     group_b_last_times = {}
-    file_group_a = monitoring_config.get("file_group_a", [])
-    file_group_b = monitoring_config.get("file_group_b", [])
 
     for file_name in os.listdir(monitored_folder_path):
         file_path = os.path.join(monitored_folder_path, file_name)
@@ -105,38 +109,58 @@ def monitor_folder(monitored_folder_path):
     group_a_newest_str = datetime.fromtimestamp(group_a_newest).strftime("%Y-%m-%d %H:%M:%S") if group_a_last_times else "N/A"
     group_b_oldest_str = datetime.fromtimestamp(group_b_oldest).strftime("%Y-%m-%d %H:%M:%S") if group_b_last_times else "N/A"
 
-    print_message(f"Monitoring {monitored_folder_path}, Group A Newest Time: {group_a_newest_str}, Group B Oldest Time: {group_b_oldest_str}")
-    return group_a_last_times, group_b_last_times, group_a_newest, group_b_oldest
+    return group_a_last_times, group_b_last_times, group_a_newest, group_b_oldest, group_a_newest_str, group_b_oldest_str
 
 def monitor_files():
     folders = monitoring_config.get("folders", [])
     check_interval = monitoring_config.get("check_interval", 2)
     cooldown_period = monitoring_config.get("cooldown_period", 2)
 
-    # 檢查所有 updating_scripts 是否存在
+    print(f"\n🚀 Monitoring system started at {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
+    print(f"📁 Total folders monitored: {len(folders)}\n")
+
+    # Check all updating_scripts exist
     for folder in folders:
         updating_script_path = expand_path(folder["updating_script"])
         if not os.path.exists(updating_script_path):
-            print_message(f"Error: Update script {updating_script_path} not found", "ERROR")
+            print_message(f"Update script not found: {updating_script_path}", "ERROR")
             return
 
-    print_message(f"Monitoring started for {len(folders)} folders")
-
+    iteration = 0
     try:
         while True:
+            iteration += 1
+            print("\n" + "-"*55)
+            print(f"🔄 Checking folders... (Iteration {iteration})\n")
             update_triggered = False
+
             for folder in folders:
                 monitored_folder_path = expand_path(folder["folder_path"])
                 updating_script_path = expand_path(folder["updating_script"])
+                file_group_a = monitoring_config.get("file_group_a", [])
+                file_group_b = monitoring_config.get("file_group_b", [])
                 if not os.path.exists(monitored_folder_path):
-                    print_message(f"Error: Folder path {monitored_folder_path} not found", "WARNING")
+                    print_message(f"Folder not found: {monitored_folder_path}", "WARNING")
                     continue
-                group_a_last_times, group_b_last_times, group_a_newest, group_b_oldest = monitor_folder(monitored_folder_path)
+
+                group_a_last_times, group_b_last_times, group_a_newest, group_b_oldest, group_a_newest_str, group_b_oldest_str = monitor_folder(
+                    monitored_folder_path, file_group_a, file_group_b
+                )
+
+                # 區塊訊息用 print (不要用 print_message 以避免多餘前綴)
+                print(
+                    f"📂 Monitoring: {monitored_folder_path}\n"
+                    f"   - Group A Newest Time: {group_a_newest_str}\n"
+                    f"   - Group B Oldest Time: {group_b_oldest_str}"
+                )
+
                 if group_a_last_times and group_b_last_times:
                     if group_a_newest > group_b_oldest:
-                        print_message(f"Group A newer than Group B in {monitored_folder_path}, entering cooldown period for {cooldown_period} seconds")
+                        print_message(f"Group A is newer than Group B, entering cooldown ({cooldown_period} seconds)...", "ACTION")
                         cooldown_start = time.time()
                         while time.time() - cooldown_start < cooldown_period:
+                            time_left = cooldown_period - (time.time() - cooldown_start)
+                            print(f"⏳ Cooldown in progress... {round(time_left, 1)} seconds left")
                             time.sleep(check_interval)
                             all_stable = True
                             for file_name in group_a_last_times.keys():
@@ -148,29 +172,36 @@ def monitor_files():
                                     if new_time > group_a_last_times[file_name]:
                                         all_stable = False
                                         group_a_last_times[file_name] = new_time
-                                        print_message(f"Group A file {file_name} in {monitored_folder_path} updated, extending cooldown")
+                                        print(f"🔁 File \"{file_name}\" in Group A was updated during cooldown, restarting cooldown timer.")
                                         cooldown_start = time.time()
                                         break
                             if all_stable:
-                                print_message(f"Cooldown ended for {monitored_folder_path}, executing update script")
-                                if run_updating_script(updating_script_path, monitored_folder_path):
-                                    print_message(f"Update script {updating_script_path} executed successfully")
-                                    update_triggered = True
+                                print("⏳ Cooldown finished, executing update script...")
+                                print_message(f"Update triggered for: {monitored_folder_path}", "ACTION")
+                                print_message(f"➤ Running update script: {updating_script_path}", "ACTION")
+                                success = run_updating_script(updating_script_path, monitored_folder_path)
+                                if success:
+                                    print_message("Update script executed successfully!", "SUCCESS")
                                 else:
-                                    print_message(f"Update script {updating_script_path} failed to execute", "WARNING")
+                                    print_message("Update script failed to execute. See error log for details.", "ERROR")
+                                update_triggered = True
                                 break
                     else:
-                        print_message(f"Group A not newer than Group B in {monitored_folder_path}, moving to next folder")
+                        print("⏩ Group A is not newer than Group B, skipping this folder\n")
                 else:
-                    print_message(f"Not all group files found in {monitored_folder_path}, moving to next folder")
-                if update_triggered:
-                    print_message("Update triggered, breaking folder loop", "ACTION")
-                    break
-            if not update_triggered:
-                print_message(f"Waiting {check_interval} seconds for the next check")
-                time.sleep(check_interval)
+                    missing = []
+                    if not group_a_last_times:
+                        missing.append("Group A")
+                    if not group_b_last_times:
+                        missing.append("Group B")
+                    missing_str = " and ".join(missing)
+                    print_message(f"Not all group files found ({missing_str}), skipping this folder", "WARNING")
+            print(f"\n⏳ Waiting {check_interval} seconds before the next check...\n")
+            time.sleep(check_interval)
     except KeyboardInterrupt:
-        print_message("Monitoring stopped manually", "WARNING")
+        print_message(f"Monitoring stopped manually at {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}", "WARNING")
+    except Exception as e:
+        print_message(f"Error: Exception occurred during monitoring: {str(e)}", "ERROR")
 
 if __name__ == "__main__":
     monitor_files()
