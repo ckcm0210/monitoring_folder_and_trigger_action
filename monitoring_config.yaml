@@ -1,26 +1,51 @@
-# This section defines the folders to be monitored.
-# Each folder has a path and an associated updating script.
+# ================================================
+# monitoring_config.yaml
+# 用於設定自動檔案監控及觸發更新腳本的參數
+# ================================================
+
+# === [1] 監控資料夾設定 ===
+# folders: 要監控的每個資料夾及其對應的更新腳本。
+# - folder_path: 欲監控的資料夾路徑。可直接填寫 network drive（如 K:\...），
+#   或使用環境變數（如 ${CHAIN_DRIVE}\...），方便不同機器部署時彈性調整。
+# - updating_script: 當監測到檔案變動且穩定後要執行的 Python 腳本路徑。
 folders:
-  - folder_path: "K:\\Chain\\2024Q4\\Preliminary\\Test2 - new"
-    updating_script: "V:\\新增資料夾\\updating.py" # 注意：這裡的 updating_script 路徑仍指向實際的 updating.py 檔案
-  - folder_path: "K:\\Chain\\2024Q4\\Preliminary\\Test2 - interim"
-    updating_script: "V:\\新增資料夾\\updating.py" # 同上
+  - folder_path: "K:\\Chain\\2024Q4\\Preliminary\\Test2 - new"        # 需要監控的資料夾路徑
+    updating_script: "V:\\新增資料夾\\updating.py"                    # 對應的更新腳本
+  - folder_path: "K:\\Chain\\2024Q4\\Preliminary\\Test2 - interim"    # 另一個監控資料夾
+    updating_script: "V:\\新增資料夾\\updating.py"                    # 同上
+  # 範例：如有多機路徑不同，可用環境變數
+  # - folder_path: "${CHAIN_DRIVE}\\Chain\\2024Q4\\Preliminary\\Test2 - new"
+  #   updating_script: "${SCRIPT_DRIVE}\\新增資料夾\\updating.py"
 
-# These are regex patterns for files in Group A.
+# === [2] Group A 文件辨識規則 ===
+# file_group_a: 需重點監控的檔案名稱規則，可用簡單字串（substring）或正則表達式（regex）。
+#   - 若用字串，任何檔名包含該字都會被匹配。
+#   - 若用正則表達式，可高度自訂（如限制副檔名、結尾、數字等）。
 file_group_a:
-  - "Data - Section"
-  - "Data - Taxes"
-  - "Data - Ownership"
-  - "Related"
+  - "Data - Section"                    # 任何檔名包含 Data - Section
+  - "^Data\\s-\\sSection.*\\.xlsx$"     # 正則：Data - Section 開頭，任何內容，.xlsx 結尾
+  - "Data - Taxes"                      # 任何檔名包含 Data - Taxes
+  - "Data\\s-\\sOwnership.*\\.xlsm$"    # 正則：Data - Ownership 開頭，.xlsm 結尾
+  - "Related[0-9]+"                     # 正則：Related 後面接一個或多個數字（如 Related123.xlsx）
 
-# These are regex patterns for files in Group B.
+# === [3] Group B 文件辨識規則 ===
+# file_group_b: 另一組需監控的檔案名稱規則，寫法同 Group A。
 file_group_b:
-  - "Data - All"
-  - "Chain Summary"
-  - "BM Compare"
+  - "Data - All"                        # 任何檔名包含 Data - All
+  - "Chain Summary"                     # 任何檔名包含 Chain Summary
+  - "BM Compare"                        # 任何檔名包含 BM Compare
+  # 也可加入正則表達式，例如：
+  # - "^BM\\sCompare_\\d{4}\\.xlsx$"    # 正則：BM Compare_四位數字.xlsx
 
-# How often to check for file changes (in seconds).
+# === [4] 監控檢查間隔設定 ===
+# check_interval: (秒) 每隔幾多秒檢查一次檔案變化。建議2~10秒。
 check_interval: 2
 
-# Cooldown period after files are detected as stable (in seconds).
+# === [5] 變動穩定後冷卻時間設定 ===
+# cooldown_period: (秒) 檔案變動停止後，需等幾多秒才執行更新腳本（避免檔案未寫完就處理）。
 cooldown_period: 2
+
+# === [備註] ===
+# - 若需多機部署且各自路徑不同，建議用環境變數，程式內用 os.path.expandvars() 取代變數。
+# - 正則表達式請用雙反斜線（\\）做 escape，否則 YAML 會誤解。
+# - 若需更複雜條件，可於 Python 程式端自訂過濾邏輯。
