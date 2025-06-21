@@ -119,7 +119,7 @@ def monitor_files():
     print(f"\n🚀 Monitoring system started at {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
     print(f"📁 Total folders monitored: {len(folders)}\n")
 
-    # Check all updating_scripts exist
+    # 檢查所有 updating_scripts 是否存在
     for folder in folders:
         updating_script_path = expand_path(folder["updating_script"])
         if not os.path.exists(updating_script_path):
@@ -147,7 +147,6 @@ def monitor_files():
                     monitored_folder_path, file_group_a, file_group_b
                 )
 
-                # 區塊訊息用 print (不要用 print_message 以避免多餘前綴)
                 print(
                     f"📂 Monitoring: {monitored_folder_path}\n"
                     f"   - Group A Newest Time: {group_a_newest_str}\n"
@@ -155,8 +154,13 @@ def monitor_files():
                 )
 
                 if group_a_last_times and group_b_last_times:
-                    if group_a_newest > group_b_oldest:
-                        print_message(f"Group A is newer than Group B, entering cooldown ({cooldown_period} seconds)...", "ACTION")
+                    dt_a = datetime.fromtimestamp(group_a_newest)
+                    dt_b = datetime.fromtimestamp(group_b_oldest)
+                    if (dt_a.year, dt_a.month, dt_a.day, dt_a.hour, dt_a.minute) >= (dt_b.year, dt_b.month, dt_b.day, dt_b.hour, dt_b.minute):
+                        print_message(
+                            f"✅ Group A ({dt_a.strftime('%Y-%m-%d %H:%M')}) >= Group B ({dt_b.strftime('%Y-%m-%d %H:%M')}), entering cooldown ({cooldown_period} seconds)...",
+                            "ACTION"
+                        )
                         cooldown_start = time.time()
                         while time.time() - cooldown_start < cooldown_period:
                             time_left = cooldown_period - (time.time() - cooldown_start)
@@ -187,7 +191,7 @@ def monitor_files():
                                 update_triggered = True
                                 break
                     else:
-                        print("⏩ Group A is not newer than Group B, skipping this folder\n")
+                        print("⏩ Group A is earlier than Group B (in year/month/day/hour/minute), skipping this folder\n")
                 else:
                     missing = []
                     if not group_a_last_times:
