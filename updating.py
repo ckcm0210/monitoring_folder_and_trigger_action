@@ -9,45 +9,16 @@ from pathlib import Path
 from utility.send_outlook_email import send_outlook_email
 import yaml
 
-with open('config.yaml', 'r', encoding='utf-8') as f:
+with open('updating_config.yaml', 'r', encoding='utf-8') as f:
     USER_CONFIG = yaml.safe_load(f)
 
+if os.environ.get("BASE_DIRECTORY_FROM_MONITOR"):
+    USER_CONFIG["base_directory"] = os.environ["BASE_DIRECTORY_FROM_MONITOR"]
 
 TO_RECIPIENTS = USER_CONFIG["email_recipients"]["to"]
 CC_RECIPIENTS = USER_CONFIG["email_recipients"]["cc"]
 BCC_RECIPIENTS = USER_CONFIG["email_recipients"]["bcc"]
 EMAIL_SUBJECT = USER_CONFIG["email_subject_prefix"]
-
-
-USER_CONFIG = {
-    "BASE_DIRECTORY": os.environ.get("BASE_DIRECTORY_FROM_MONITOR"),
-    "LOG_DIRECTORY": config_data["log_directory"],
-    "FILE_CONFIGS": {
-        "Data - All": {
-            "macro": None,
-            "open_password": None,
-            "write_password": "2011chainref"
-        },
-        "Chain Summary": {
-            "macro": None,
-            "open_password": None,
-            "write_password": "2011chainref"
-        },
-        "BM Compare": {
-            "macro": "Main",
-            "open_password": None,
-            "write_password": None
-        }
-    },
-    "ADVANCED_SETTINGS": {
-        "max_retries": 3,
-        "retry_delay_base": 2,
-        "excel_visible": True,
-        "force_calculation": True
-    }
-}
-
-
 
 # Global variable: logger instance
 logger = None
