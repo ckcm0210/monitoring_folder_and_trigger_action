@@ -10,13 +10,14 @@ from utility.send_outlook_email import send_outlook_email
 import yaml
 
 with open('config.yaml', 'r', encoding='utf-8') as f:
-    config_data = yaml.safe_load(f)
+    USER_CONFIG = yaml.safe_load(f)
 
 
-TO_RECIPIENTS = config_data["email_recipients"]["to"]
-CC_RECIPIENTS = config_data["email_recipients"]["cc"]
-BCC_RECIPIENTS = config_data["email_recipients"]["bcc"]
-EMAIL_SUBJECT = config_data["email_subject_prefix"]
+TO_RECIPIENTS = USER_CONFIG["email_recipients"]["to"]
+CC_RECIPIENTS = USER_CONFIG["email_recipients"]["cc"]
+BCC_RECIPIENTS = USER_CONFIG["email_recipients"]["bcc"]
+EMAIL_SUBJECT = USER_CONFIG["email_subject_prefix"]
+
 
 USER_CONFIG = {
     "BASE_DIRECTORY": os.environ.get("BASE_DIRECTORY_FROM_MONITOR"),
