@@ -111,7 +111,7 @@ def safe_execute(func, *args, **kwargs):
                 time.sleep(retry_delay_base ** attempt)  # Exponential backoff wait
             else:
                 raise e  # Raise exception on final attempt failure
-
+"""
 def get_last_save_author_improved(file_path, has_password=False, open_password=None, workbook_obj=None):
     """
     Improved version: Get Excel file's last author information using multiple methods
@@ -144,7 +144,7 @@ def get_last_save_author_improved(file_path, has_password=False, open_password=N
         return "Password protected file, cannot get author info via openpyxl"
     else:
         return "Cannot get author info"
-
+"""
 def get_workbook_essential_properties(workbook_obj):
     """
     Get essential properties from opened Excel workbook object (only show Last Author and Last Save Time)
