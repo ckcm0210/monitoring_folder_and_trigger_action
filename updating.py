@@ -270,7 +270,7 @@ def refresh_workbook_connections(workbook):
             console_print("")
         
         # Force recalculate all formulas
-        if USER_CONFIG["ADVANCED_SETTINGS"]["force_calculation"]:
+        if USER_CONFIG["advanced_settings"]["force_calculation"]:
             console_print("🧮 Performing full formula recalculation...")
             workbook.Application.CalculateFullRebuild()  # Force full rebuild calculation
             console_print("   ✅ Formula calculation completed")
@@ -524,7 +524,7 @@ def automate_excel_refresh_links(excel_file_path, file_config):
         # Start Excel application for actual processing
         console_print("🚀 Starting Excel application for processing...")
         excel_app = win32.Dispatch("Excel.Application")  # Create Excel application object
-        excel_app.Visible = USER_CONFIG["ADVANCED_SETTINGS"]["excel_visible"]  # Set visibility
+        excel_app.Visible = USER_CONFIG["advanced_settings"]["excel_visible"]  # Set visibility
         excel_app.DisplayAlerts = False  # Don't display alert messages
         excel_app.EnableEvents = False   # Disable events to improve performance
         console_print("   ✅ Excel application startup completed")
