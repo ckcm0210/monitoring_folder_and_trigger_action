@@ -32,7 +32,7 @@ def setup_logging():
     global logger
     
     # Ensure log directory exists
-    log_dir = USER_CONFIG["LOG_DIRECTORY"]
+    log_dir = USER_CONFIG["log_directory"]
     Path(log_dir).mkdir(parents=True, exist_ok=True)  # Create log directory if not exists
     
     # Generate meaningful log filename
@@ -68,7 +68,7 @@ def setup_logging():
     logger.info("🚀 Excel automation program started")
     logger.info(f"📁 Log directory created/confirmed: {log_dir}")  # This will now have proper formatting
     logger.info(f"📄 Log file: {log_filename}")
-    logger.info(f"📁 Configured base directory: {USER_CONFIG['BASE_DIRECTORY']}")
+    logger.info(f"📁 Configured base directory: {USER_CONFIG['base_directory']}")
     logger.info(f"🏷️ Configured file prefixes: {list(USER_CONFIG['FILE_CONFIGS'].keys())}")
     logger.info("="*80)
     
@@ -98,8 +98,8 @@ def console_print(message, level='info'):
 
 def safe_execute(func, *args, **kwargs):
     """Safely execute function with retry mechanism"""
-    max_retries = USER_CONFIG["ADVANCED_SETTINGS"]["max_retries"]  # Get maximum retry count
-    retry_delay_base = USER_CONFIG["ADVANCED_SETTINGS"]["retry_delay_base"]  # Get retry delay base
+    max_retries = USER_CONFIG["advanced_settings"]["max_retries"]  # Get maximum retry count
+    retry_delay_base = USER_CONFIG["advanced_settings"]["retry_delay_base"]  # Get retry delay base
     
     # Perform multiple retry attempts
     for attempt in range(max_retries):
@@ -753,7 +753,7 @@ def validate_configuration():
         errors.append("No file configurations specified")
     
     # Check advanced settings
-    advanced = USER_CONFIG["ADVANCED_SETTINGS"]
+    advanced = USER_CONFIG["advanced_settings"]
     if advanced["max_retries"] < 1:
         errors.append("max_retries must be at least 1")
     if advanced["retry_delay_base"] < 1:
