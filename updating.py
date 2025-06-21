@@ -745,8 +745,8 @@ def validate_configuration():
     errors = []
     
     # Check base directory
-    if not os.path.exists(USER_CONFIG["BASE_DIRECTORY"]):
-        errors.append(f"Base directory does not exist: {USER_CONFIG['BASE_DIRECTORY']}")
+    if not os.path.exists(USER_CONFIG["base_directory"]):
+        errors.append(f"Base directory does not exist: {USER_CONFIG['base_directory']}")
     
     # Check file configurations
     if not USER_CONFIG["FILE_CONFIGS"]:
