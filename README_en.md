@@ -17,14 +17,14 @@ This project primarily consists of the following modules:
 
 To ensure that the program can correctly locate and import all modules and configuration files, your project directory structure should ideally be as follows:
 
-your_project_root/
-├── main_workflow.py
-├── monitoring.py
-├── monitoring_config.yaml
-├── updating.py
-├── updating_config.yaml
-└── utility/
-     └── send_outlook_email.py
+your_project_root/<br/>
+├── main_workflow.py<br/>
+├── monitoring.py<br/>
+├── monitoring_config.yaml<br/>
+├── updating.py<br/>
+├── updating_config.yaml<br/>
+└── utility/<br/>
+     └── send_outlook_email.py<br/>
 
 * `your_project_root/`: This is your main project directory.
 * `main_workflow.py`, `monitoring.py`, `updating.py`: These are the main Python scripts, located directly under the project root.
