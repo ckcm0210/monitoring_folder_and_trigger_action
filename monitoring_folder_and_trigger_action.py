@@ -12,6 +12,7 @@ import yaml
 from utility.send_outlook_email import send_outlook_email
 
 # Define user configuration with lists of regular expressions and folder paths
+"""
 user_config = {
     "folders": [
         {
@@ -28,10 +29,10 @@ user_config = {
     "check_interval": 2,  # Check every 30 seconds
     "cooldown_period": 2  # Cooldown period of 60 seconds
 }
-
+"""
 
 with open('config.yaml', 'r', encoding='utf-8') as f:
-    config_data = yaml.safe_load(f)
+    user_config = yaml.safe_load(f)
 
 
 
