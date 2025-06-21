@@ -23,7 +23,6 @@ folders:
 #   - 若用正則表達式，可高度自訂（如限制副檔名、結尾、數字等）。
 file_group_a:
   - "Data - Section"                    # 任何檔名包含 Data - Section
-  - "^Data\\s-\\sSection.*\\.xlsx$"     # 正則：Data - Section 開頭，任何內容，.xlsx 結尾
   - "Data - Taxes"                      # 任何檔名包含 Data - Taxes
   - "Data\\s-\\sOwnership.*\\.xlsm$"    # 正則：Data - Ownership 開頭，.xlsm 結尾
   - "Related[0-9]+"                     # 正則：Related 後面接一個或多個數字（如 Related123.xlsx）
