@@ -109,7 +109,8 @@ your_project_root/
 #### Example
 ```yaml
 folders:
-  - folder_path: "K:\\Chain\\2024Q4\\Preliminary\\Test2 - new"
+  - folder_path: "K:\\2024Q4\\P
+Test2 - new"
     updating_script: "V:\\SomeFolder\\updating.py"
 file_group_a:
   - "Data - Section"
