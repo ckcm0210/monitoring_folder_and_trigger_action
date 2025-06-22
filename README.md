@@ -109,7 +109,7 @@ your_project_root/
 #### 範例片段
 ```yaml
 folders:
-  - folder_path: "K:\\Chain\\2024Q4\\Preliminary\\Test2 - new"
+  - folder_path: "K:\\2024Q4\\Test2 - new"
     updating_script: "V:\\新增資料夾\\updating.py"
 file_group_a:
   - "Data - Section"
