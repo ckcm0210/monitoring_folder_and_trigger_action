@@ -95,11 +95,6 @@ def send_outlook_email(to_recipients: list, subject: str, body: str = "", html_b
             print("app_outlook object released.")
         print("\nProgram finished. All COM objects attempted to be released.")
 
----
-
-##
-# `if __name__ == "__main__":` 主程式模板
-#
 if __name__ == "__main__":
     print("--- Script Started ---")
 
