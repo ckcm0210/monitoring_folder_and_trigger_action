@@ -15,7 +15,7 @@ email_recipients:
 
 # === [2] 電郵主旨前綴設定 ===
 # email_subject_prefix: 發送通知電郵時，主旨會加上此前綴字，有助辨認來源
-email_subject_prefix: "K Chain File Refresh Completion Notification"
+email_subject_prefix: "Refresh Completion Notification"
 
 # === [3] 日誌檔案儲存路徑 ===
 # log_directory: 執行記錄和錯誤日誌會存於這個資料夾
